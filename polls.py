@@ -1,7 +1,13 @@
+import jinja2
+import os
 import webapp2
 
 from google.appengine.api import users
 from google.appengine.ext import db
+
+
+jinja_environment = jinja2.Environment(
+        loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
 
 class Poll(db.Model):
@@ -15,11 +21,31 @@ class MainPage(webapp2.RequestHandler):
     def get(self):
         user = users.get_current_user()
 
-        self.response.headers['Content-type'] = 'text/plain'
         if user:
-            self.response.write('Hello ' + user.nickname())
+            template = jinja_environment.get_template('index.html')
+            polls = db.GqlQuery("SELECT * "
+                                "FROM Poll "
+                                "ORDER BY date DESC LIMIT 10")
+            template_values = {'polls': polls}
+            self.response.write(template.render(template_values))
         else:
             self.redirect(users.create_login_url(self.request.uri))
 
-app = webapp2.WSGIApplication([('/', MainPage)], debug=True)
+
+class AddPoll(webapp2.RequestHandler):
+    def post(self):
+        question = self.request.get('question')
+        poll = Poll()
+        poll.question = question
+        if users.get_current_user():
+            poll.author = users.get_current_user()
+        poll.put()
+        self.redirect('/')
+
+
+
+app = webapp2.WSGIApplication([
+    ('/', MainPage),
+    ('/addpoll/', AddPoll),
+], debug=True)
 
