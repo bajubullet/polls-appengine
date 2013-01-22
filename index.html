@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Appengine Polls Demo</title>
+        <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="span8 offset2">
+                    <h1>Polls Demo</h1>
+                    <form action="/addpoll/" method="post" class="form-inline">
+                        <input type="text" class="input-xxlarge" name="question" placeholder="Add your question..."/>
+                        <button type="submit" class="btn"><i class="icon-plus"></i>Add Question</button>
+                    </form>
+                    {% for poll in polls %}
+                    <div class="well">
+                        <a href="#"><h3>{{ poll.question }}</h3></a>
+                        <p><b>Asked by:</b> {{ poll.author }}, {{ poll.date }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>
+    </body>
+</html>
+
